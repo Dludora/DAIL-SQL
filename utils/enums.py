@@ -52,6 +52,14 @@ class LLM:
     GPT_35_TURBO_0301 = "gpt-3.5-turbo-0301"
     GPT_4 = "gpt-4"
 
+    # local LLMs
+    LLAMA_7B = "llama-7b"
+    ALPACA_7B = "alpaca-7b"
+    GRANITE_8B_BASE = "granite-8b-base"
+    GRANITE_8B_INSTRUCT = "granite-8b-instruct"
+    GRANITE_20B_INSTRUCT = "granite-20b-instruct"
+    # TONG_YI_QIAN_WEN = "qwen-v1"
+
     # LLMs that use openai completion api
     TASK_COMPLETIONS = [
         TEXT_DAVINCI_003,
@@ -64,13 +72,16 @@ class LLM:
         GPT_35_TURBO_0613,
         GPT_35_TURBO_16K,
         GPT_35_TURBO_0301,
-        GPT_4
+        GPT_4,
     ]
 
     # LLMs that can run in batch
     BATCH_FORWARD = [
         TEXT_DAVINCI_003,
-        CODE_DAVINCI_002
+        CODE_DAVINCI_002,
+        GRANITE_8B_BASE,
+        GRANITE_8B_INSTRUCT,
+        GRANITE_20B_INSTRUCT,
     ]
 
     costs_per_thousand = {
@@ -83,7 +94,41 @@ class LLM:
         GPT_4: 0.03
     }
 
-    # local LLMs
-    LLAMA_7B = "llama-7b"
-    ALPACA_7B = "alpaca-7b"
-    # TONG_YI_QIAN_WEN = "qwen-v1"
+    LLMS = [
+        TEXT_DAVINCI_003,
+        CODE_DAVINCI_002,
+        GPT_35_TURBO,
+        GPT_35_TURBO_0613,
+        GPT_35_TURBO_16K,
+        GPT_35_TURBO_0301,
+        GPT_4,
+        LLAMA_7B,
+        ALPACA_7B,
+        GRANITE_8B_BASE,
+        GRANITE_8B_INSTRUCT,
+        GRANITE_20B_INSTRUCT,
+    ]
+
+    OPEN_AI_LLM = {
+        TEXT_DAVINCI_003,
+        CODE_DAVINCI_002,
+        GPT_35_TURBO,
+        GPT_35_TURBO_0613,
+        GPT_35_TURBO_16K,
+        GPT_35_TURBO_0301,
+        GPT_4
+    }
+
+    OPEN_SOURCE_LLM = {
+        LLAMA_7B,
+        ALPACA_7B,
+        GRANITE_8B_BASE,
+        GRANITE_8B_INSTRUCT,
+        GRANITE_20B_INSTRUCT,
+    }
+
+    OPEN_SOURCE_2_PATH = {
+        GRANITE_8B_BASE: "/data/koushurui/Code/LLMS/ibm-granite/granite-8b-code-base",
+        GRANITE_8B_INSTRUCT: "/data/koushurui/Code/LLMS/ibm-granite/granite-8b-code-instruct",
+        GRANITE_20B_INSTRUCT: "/data/koushurui/Code/LLMS/ibm-granite/granite-20b-code-instruct"
+    }

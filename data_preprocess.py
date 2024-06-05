@@ -6,7 +6,6 @@ from pathlib import Path
 import sqlite3
 from tqdm import tqdm
 import random
-
 from utils.linking_process import SpiderEncoderV2Preproc
 from utils.pretrained_embeddings import GloVe
 from utils.datasets.spider import load_tables
@@ -19,11 +18,23 @@ def schema_linking_producer(test, train, table, db, dataset_dir, compute_cv_link
     test_data = json.load(open(os.path.join(dataset_dir, test)))
     train_data = json.load(open(os.path.join(dataset_dir, train)))
 
+    table_test = 'test_data/' + table
+    table_train = table 
     # load schemas
-    schemas, _ = load_tables([os.path.join(dataset_dir, table)])
+    schemas_test, _ = load_tables([os.path.join(dataset_dir, table_test)])
+    schemas_train, _ = load_tables([os.path.join(dataset_dir, table_train)])
 
     # Backup in-memory copies of all the DBs and create the live connections
-    for db_id, schema in tqdm(schemas.items(), desc="DB connections"):
+    for db_id, schema in tqdm(schemas_test.items(), desc="test DB connections"):
+        sqlite_path = Path(dataset_dir) / ("test_" + db) / db_id / f"{db_id}.sqlite"
+        source: sqlite3.Connection
+        with sqlite3.connect(str(sqlite_path)) as source:
+            dest = sqlite3.connect(':memory:')
+            dest.row_factory = sqlite3.Row
+            source.backup(dest)
+        schema.connection = dest
+    
+    for db_id, schema in tqdm(schemas_train.items(), desc="train DB connections"):
         sqlite_path = Path(dataset_dir) / db / db_id / f"{db_id}.sqlite"
         source: sqlite3.Connection
         with sqlite3.connect(str(sqlite_path)) as source:
@@ -46,7 +57,7 @@ def schema_linking_producer(test, train, table, db, dataset_dir, compute_cv_link
     for data, section in zip([test_data, train_data],['test', 'train']):
         for item in tqdm(data, desc=f"{section} section linking"):
             db_id = item["db_id"]
-            schema = schemas[db_id]
+            schema = schemas_test[db_id] if section == 'test' else schemas_train[db_id]
             to_add, validation_info = linking_processor.validate_item(item, schema, section)
             if to_add:
                 linking_processor.add_item(item, schema, section, validation_info)
@@ -105,14 +116,14 @@ def bird_pre_process(bird_dir, with_evidence=False):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_dir", type=str, default="./dataset/spider")
+    parser.add_argument("--data_root", type=str, default="/data/koushurui/Data/text2sql")
     parser.add_argument("--data_type", type=str, choices=["spider", "bird"], default="spider")
     args = parser.parse_args()
 
     data_type = args.data_type
     if data_type == "spider":
         # merge two training split of Spider
-        spider_dir = args.data_dir
+        spider_dir = os.path.join(args.data_root, 'spider')
         split1 = "train_spider.json"
         split2 = "train_others.json"
         total_train = []
@@ -124,14 +135,15 @@ if __name__ == '__main__':
             json.dump(total_train, f)
 
         # schema-linking between questions and databases for Spider
-        spider_dev = "dev.json"
+        spider_dev = "test_data/dev.json"
         spider_train = 'train_spider_and_others.json'
+        spider_table = 'tables.json'
         spider_table = 'tables.json'
         spider_db = 'database'
         schema_linking_producer(spider_dev, spider_train, spider_table, spider_db, spider_dir)
     elif data_type == "bird":
         # schema-linking for bird with evidence
-        bird_dir = './dataset/bird'
+        bird_dir = os.path.join(args.data_root, 'bird')
         bird_pre_process(bird_dir, with_evidence=True)
         bird_dev = 'dev.json'
         bird_train = 'train.json'

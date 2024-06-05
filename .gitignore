@@ -1,2 +1,8 @@
 .idea
 .DS_Store
+pretrained_model/
+third_party/
+vector_cache/
+*/__pycache__
+img/
+.ipynb_checkpoints/

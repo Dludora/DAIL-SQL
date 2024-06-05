@@ -91,7 +91,6 @@ class Schema:
     orig = attr.ib()
     connection = attr.ib(default=None)
 
-
 def postprocess_original_name(s: str):
     return re.sub(r'([A-Z]+)', r' \1', s).replace('_', ' ').lower().strip()
 

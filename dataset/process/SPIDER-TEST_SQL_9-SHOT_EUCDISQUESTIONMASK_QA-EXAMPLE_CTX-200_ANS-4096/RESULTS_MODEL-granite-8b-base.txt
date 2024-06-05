@@ -1,0 +1,182 @@
+/* Some SQL examples are provided based on similar problems: */
+/* Answer the following: How many aircrafts do we have? */
+SELECT count(*) FROM Aircraft
+
+/* Answer the following: How many employees do we have? */
+SELECT count(*) FROM Employee
+
+/* Answer the following: How many flights do we have? */
+SELECT count(*) FROM Flight
+
+/* Answer the following: How many accounts do we have? */
+SELECT count(*) FROM Accounts
+
+/* Answer the following: How many customers do we have? */
+SELECT count(*) FROM Customers
+
+/* Answer the following: How many tracks do we have? */
+SELECT count(*) FROM track
+
+/* Answer the following: How many transactions do we have? */
+SELECT count(*) FROM Financial_transactions
+
+/* Answer the following: How many invoices do we have? */
+SELECT count(*) FROM Invoices
+
+/* Answer the following: How many artists do we have? */
+SELECT count(*) FROM artist
+
+/* Given the following database schema: */
+CREATE TABLE "stadium" (
+"Stadium_ID" int,
+"Location" text,
+"Name" text,
+"Capacity" int,
+"Highest" int,
+"Lowest" int,
+"Average" int,
+PRIMARY KEY ("Stadium_ID")
+)
+
+CREATE TABLE "singer" (
+"Singer_ID" int,
+"Name" text,
+"Country" text,
+"Song_Name" text,
+"Song_release_year" text,
+"Age" int,
+"Is_male" bool,
+PRIMARY KEY ("Singer_ID")
+)
+
+CREATE TABLE "concert" (
+"concert_ID" int,
+"concert_Name" text,
+"Theme" text,
+"Stadium_ID" text,
+"Year" text,
+PRIMARY KEY ("concert_ID"),
+FOREIGN KEY ("Stadium_ID") REFERENCES "stadium"("Stadium_ID")
+)
+
+CREATE TABLE "singer_in_concert" (
+"concert_ID" int,
+"Singer_ID" text,
+PRIMARY KEY ("concert_ID","Singer_ID"),
+FOREIGN KEY ("concert_ID") REFERENCES "concert"("concert_ID"),
+FOREIGN KEY ("Singer_ID") REFERENCES "singer"("Singer_ID")
+)
+
+/* Answer the following: How many singers do we have? */
+SELECT  count(*) FROM singer
+
+/* Answer the following: How many concerts do we have? */
+SELECT  count(*) FROM concert
+
+/* Answer the following: How many singers are in concert 1? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 1
+
+/* Answer the following: How many singers are in concert 2? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 2
+
+/* Answer the following: How many singers are in concert 3? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 3
+
+/* Answer the following: How many singers are in concert 4? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 4
+
+/* Answer the following: How many singers are in concert 5? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 5
+
+/* Answer the following: How many singers are in concert 6? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 6
+
+/* Answer the following: How many singers are in concert 7? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 7
+
+/* Answer the following: How many singers are in concert 8? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 8
+
+/* Answer the following: How many singers are in concert 9? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 9
+
+/* Answer the following: How many singers are in concert 10? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 10
+
+/* Answer the following: How many singers are in concert 11? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 11
+
+/* Answer the following: How many singers are in concert 12? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 12
+
+/* Answer the following: How many singers are in concert 13? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 13
+
+/* Answer the following: How many singers are in concert 14? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 14
+
+/* Answer the following: How many singers are in concert 15? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 15
+
+/* Answer the following: How many singers are in concert 16? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 16
+
+/* Answer the following: How many singers are in concert 17? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 17
+
+/* Answer the following: How many singers are in concert 18? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 18
+
+/* Answer the following: How many singers are in concert 19? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 19
+
+/* Answer the following: How many singers are in concert 20? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 20
+
+/* Answer the following: How many singers are in concert 21? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 21
+
+/* Answer the following: How many singers are in concert 22? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 22
+
+/* Answer the following: How many singers are in concert 23? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 23
+
+/* Answer the following: How many singers are in concert 24? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 24
+
+/* Answer the following: How many singers are in concert 25? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 25
+
+/* Answer the following: How many singers are in concert 26? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 26
+
+/* Answer the following: How many singers are in concert 27? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 27
+
+/* Answer the following: How many singers are in concert 28? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 28
+
+/* Answer the following: How many singers are in concert 29? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 29
+
+/* Answer the following: How many singers are in concert 30? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 30
+
+/* Answer the following: How many singers are in concert 31? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 31
+
+/* Answer the following: How many singers are in concert 32? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 32
+
+/* Answer the following: How many singers are in concert 33? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 33
+
+/* Answer the following: How many singers are in concert 34? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 34
+
+/* Answer the following: How many singers are in concert 35? */
+SELECT  count(*) FROM singer_in_concert WHERE concert_ID = 35
+
+/* Answer the following: How many singers are in concert 36? */
+SELECT 

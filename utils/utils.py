@@ -2,8 +2,9 @@ import collections
 import json
 import os
 import re
+import sys
 import sqlite3
-
+  
 from transformers import AutoTokenizer
 from utils.enums import LLM
 from sql_metadata import Parser
@@ -186,8 +187,11 @@ def sql_normalization(sql):
     sql = sql.strip()
     def white_space_fix(s):
         parsed_s = Parser(s)
-        s = " ".join([token.value for token in parsed_s.tokens])
-
+        try:
+            s = " ".join([token.value for token in parsed_s.tokens])
+        except Exception as e:
+            print(s)
+            exit
         return s
 
     # convert everything except text between single quotation marks to lower case
@@ -253,7 +257,11 @@ def sql_normalization(sql):
         return toks
 
     def remove_table_alias(s):
-        tables_aliases = Parser(s).tables_aliases
+        try:
+            tables_aliases = Parser(s).tables_aliases
+        except Exception as e:
+            print(s)
+            exit
         new_tables_aliases = {}
         for i in range(1, 11):
             if "t{}".format(i) in tables_aliases.keys():
@@ -427,3 +435,81 @@ def jaccard_similarity(skeleton1, skeleton2):
             intersection += min(token_dict1[t], token_dict2[t])
     union = (len(tokens1) + len(tokens2)) - intersection
     return float(intersection) / union
+
+def get_template(prompts):
+    if isinstance(prompts, str):
+        prompts = [prompts]
+    question_pattern = re.compile(r'(/\* Answer the following: .*? \*/\nSELECT .*)')
+    shot_pattern = re.compile(r'(/\* Some SQL examples are provided based on similar problems: \*/.*)')
+    chat = []
+    for prompt in prompts:
+        question = question_pattern.findall(prompt)[-1]
+        shot = prompt.split(question)[0]
+        chat.append([
+            {
+                "role": "system",
+                "content": "Please return only the SQL query that starts with \"SELECT\"."
+            },
+            {
+                "role": "system",
+                "content": shot,
+            },
+            {
+                "role": "user",
+                "content": question
+            }
+        ])
+    return chat
+
+def get_answer2(answer):
+    assert isinstance(answer, str)
+    
+    # 合并两个正则表达式为一个，减少匹配次数
+    answer_pattern = re.compile(r'Answer:\n(?:.*?```.*?(SELECT .*?)```|[^\(]*?(SELECT .*?))', re.DOTALL)
+    match = answer_pattern.search(answer)
+    
+    if match:
+        ans = match.group(1) or match.group(2)
+    else:
+        # 如果上述方式没有匹配到，则尝试匹配 `Answer:` 后的其余部分
+        fallback_pattern = re.compile(r'Answer:\n(.*)', re.DOTALL)
+        fallback_match = fallback_pattern.search(answer)
+        if fallback_match:
+            ans = "SELECT " + fallback_match.group(1).strip()
+        else:
+            ans = ""
+    
+    # 去除多余的空白字符并去掉末尾的分号
+    ans = re.sub(r'\s+', ' ', ans).strip().split(';')[0]
+    
+    return ans
+
+def get_answer(answer):
+    assert isinstance(answer, str)
+    answer_pattern = re.compile(r'Answer:\n.*?\`\`\`.*?(SELECT .*).*?\`\`\`', re.DOTALL)
+    match = answer_pattern.findall(answer)
+    if len(match) >= 1:
+        ans = match[0]
+    else:
+        answer_pattern = re.compile(r'Answer:\n[^\(]*?(SELECT .*)', re.DOTALL)
+        match = answer_pattern.findall(answer)
+        ans = match[0] if len(match) >= 1 else "SELECT " + re.findall(r'Answer:\n(.*)', answer, re.DOTALL)[-1]
+    
+    ans = re.sub(r'\s+', ' ', ans)
+    ans = ans.strip().split(';')[0]
+    return ans
+
+if __name__ == '__main__':
+    # questions = [
+    #     "/* Some SQL examples are provided based on similar problems: */\n/* Answer the following: What is the total number of students? */\nSELECT count(*) FROM Student\n\n/* Answer the following: What is the total number of companies? */\nSELECT count(*) FROM company\n\n/* Answer the following: What is the total number of campuses? */\nSELECT count(*) FROM campuses\n\n/* Answer the following: What is the total number of games played? */\nSELECT sum(gamesplayed) FROM Sportsinfo\n\n/* Answer the following: What is the total count of enzymes? */\nSELECT count(*) FROM enzyme\n\n/* Answer the following: What is the number of employees? */\nSELECT count(*) FROM Employee\n\n/* Answer the following: What is the number of flights? */\nSELECT count(*) FROM Flight\n\n/* Answer the following: What is the number of technicians? */\nSELECT count(*) FROM technician\n\n/* Answer the following: What is the number of ships? */\nSELECT count(*) FROM ship\n\n/* Given the following database schema: */\nCREATE TABLE \"stadium\" (\n\"Stadium_ID\" int,\n\"Location\" text,\n\"Name\" text,\n\"Capacity\" int,\n\"Highest\" int,\n\"Lowest\" int,\n\"Average\" int,\nPRIMARY KEY (\"Stadium_ID\")\n)\n\nCREATE TABLE \"singer\" (\n\"Singer_ID\" int,\n\"Name\" text,\n\"Country\" text,\n\"Song_Name\" text,\n\"Song_release_year\" text,\n\"Age\" int,\n\"Is_male\" bool,\nPRIMARY KEY (\"Singer_ID\")\n)\n\nCREATE TABLE \"concert\" (\n\"concert_ID\" int,\n\"concert_Name\" text,\n\"Theme\" text,\n\"Stadium_ID\" text,\n\"Year\" text,\nPRIMARY KEY (\"concert_ID\"),\nFOREIGN KEY (\"Stadium_ID\") REFERENCES \"stadium\"(\"Stadium_ID\")\n)\n\nCREATE TABLE \"singer_in_concert\" (\n\"concert_ID\" int,\n\"Singer_ID\" text,\nPRIMARY KEY (\"concert_ID\",\"Singer_ID\"),\nFOREIGN KEY (\"concert_ID\") REFERENCES \"concert\"(\"concert_ID\"),\nFOREIGN KEY (\"Singer_ID\") REFERENCES \"singer\"(\"Singer_ID\")\n)\n\n/* Answer the following: What is the total number of singers? */\nSELECT "
+    # ]
+    # get_template(questions)
+    answer = """
+Answer:
+SELECT T1.ShipmentID FROM Shipment AS T1 JOIN Has_Clearance AS T2 ON T1.Manager = T2.Employee WHERE T2.Planet = (SELECT PlanetID FROM Planet WHERE Name = "Mars") AND T2.Level = 1 AND T1.Planet = (SELECT PlanetID FROM Planet WHERE Name = "Mars") AND T1.Date > '2017-06-19 02:59:21'
+        """
+    print(get_answer2(answer))
+
+    # with open('../results/original_text.txt', "r") as f:
+    #     text = f.read()
+    #     get_answer2(text)

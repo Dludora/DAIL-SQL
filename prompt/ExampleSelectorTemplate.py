@@ -46,7 +46,7 @@ class CosineSimilarExampleSelector(BasicExampleSelector):
     def __init__(self, data, *args, **kwargs):
         super().__init__(data)
 
-        self.SELECT_MODEL = "sentence-transformers/all-mpnet-base-v2"
+        self.SELECT_MODEL = "/home/koushurui/Documents/Code/DAIL-SQL/pretrained_model/all-mpnet-base-v2"
         # self.SELECT_MODEL = "sentence-transformers/bert-base-nli-mean-tokens"
 
         from sentence_transformers import SentenceTransformer
@@ -83,7 +83,7 @@ class EuclideanDistanceExampleSelector(BasicExampleSelector):
     def __init__(self, data, *args, **kwargs):
         super().__init__(data)
 
-        self.SELECT_MODEL = "sentence-transformers/all-mpnet-base-v2"
+        self.SELECT_MODEL = "/home/koushurui/Documents/Code/DAIL-SQL/pretrained_model/all-mpnet-base-v2"
 
         from sentence_transformers import SentenceTransformer
         self.bert_model = SentenceTransformer(self.SELECT_MODEL, device="cpu")
@@ -115,7 +115,7 @@ class EuclideanDistanceThresholdExampleSelector(BasicExampleSelector):
     def __init__(self, data, *args, **kwargs):
         super().__init__(data)
 
-        self.SELECT_MODEL = "sentence-transformers/all-mpnet-base-v2"
+        self.SELECT_MODEL = "/home/koushurui/Documents/Code/DAIL-SQL/pretrained_model/all-mpnet-base-v2"
         # self.top_distances = list()
         self.threshold = 0.85
 
@@ -153,7 +153,7 @@ class EuclideanDistanceSkeletonSimilarThresholdSelector(BasicExampleSelector):
     def __init__(self, data, *args, **kwargs):
         super().__init__(data)
 
-        self.SELECT_MODEL = "sentence-transformers/all-mpnet-base-v2"
+        self.SELECT_MODEL = "/home/koushurui/Documents/Code/DAIL-SQL/pretrained_model/all-mpnet-base-v2"
         self.threshold = 0.85
         self.mask_token = "<mask>"  # the "<mask>" is the mask token of all-mpnet-base-v2
         self.value_token = "<unk>"  # the "<unk>" is the unknown token of all-mpnet-base-v2
@@ -205,7 +205,7 @@ class EuclideanDistanceQuestionMaskSelector(BasicExampleSelector):
     def __init__(self, data, *args, **kwargs):
         super().__init__(data)
 
-        self.SELECT_MODEL = "sentence-transformers/all-mpnet-base-v2"
+        self.SELECT_MODEL = "/home/koushurui/Documents/Code/DAIL-SQL/pretrained_model/all-mpnet-base-v2"
         self.mask_token = "<mask>"  # the "<mask>" is the mask token of all-mpnet-base-v2
         self.value_token = "<unk>" # the "<unk>" is the unknown token of all-mpnet-base-v2
 
@@ -241,7 +241,7 @@ class EuclideanDistancePreSkeletonSimilarThresholdSelector(BasicExampleSelector)
     def __init__(self, data, *args, **kwargs):
         super().__init__(data)
 
-        self.SELECT_MODEL = "sentence-transformers/all-mpnet-base-v2"
+        self.SELECT_MODEL = "/home/koushurui/Documents/Code/DAIL-SQL/pretrained_model/all-mpnet-base-v2"
         self.threshold = 0.85
 
         from sentence_transformers import SentenceTransformer
@@ -289,7 +289,7 @@ class EuclideanDistancePreSkeletonSimilarPlusSelector(BasicExampleSelector):
     def __init__(self, data, *args, **kwargs):
         super().__init__(data)
 
-        self.SELECT_MODEL = "sentence-transformers/all-mpnet-base-v2"
+        self.SELECT_MODEL = "/home/koushurui/Documents/Code/DAIL-SQL/pretrained_model/all-mpnet-base-v2"
 
         from sentence_transformers import SentenceTransformer
         self.bert_model = SentenceTransformer(self.SELECT_MODEL, device="cpu")
@@ -322,7 +322,7 @@ class EuclideanDistanceQuestionMaskPreSkeletonSimilarThresholdSelector(BasicExam
     def __init__(self, data, *args, **kwargs):
         super().__init__(data)
 
-        self.SELECT_MODEL = "sentence-transformers/all-mpnet-base-v2"
+        self.SELECT_MODEL = "/home/koushurui/Documents/Code/DAIL-SQL/pretrained_model/all-mpnet-base-v2"
         self.mask_token = "<mask>"  # the "<mask>" is the mask token of all-mpnet-base-v2
         self.value_token = "<unk>"  # the "<unk>" is the unknown token of all-mpnet-base-v2
         self.threshold = 0.85
@@ -374,7 +374,7 @@ class EuclideanDistanceQuestionMaskPreSkeletonSimilarThresholdShiftSelector(Basi
     def __init__(self, data, *args, **kwargs):
         super().__init__(data)
 
-        self.SELECT_MODEL = "sentence-transformers/all-mpnet-base-v2"
+        self.SELECT_MODEL = "/home/koushurui/Documents/Code/DAIL-SQL/pretrained_model/all-mpnet-base-v2"
         self.mask_token = "<mask>"  # the "<mask>" is the mask token of all-mpnet-base-v2
         self.value_token = "<unk>"  # the "<unk>" is the unknown token of all-mpnet-base-v2
         self.threshold = 0.85
