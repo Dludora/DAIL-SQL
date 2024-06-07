@@ -137,11 +137,14 @@ if __name__ == '__main__':
         #         finally:
         #             f1.write(output)
 
-        with open(out_file, "w") as f1, open("./results/original_text.txt", "w") as f2:
+        with open(out_file, "w") as f1, open("./results/original_text.txt", "w") as f2, open("./results/wrong_text.txt", "w") as f3:
             processor = tqdm(question_loader)
             for i, batch in enumerate(processor):
                 s_time = time.time()
-                chat = get_template(batch)
+                try:
+                    chat = get_template(batch)
+                except Exception:
+                    f3.write(batch[0])
                 chat = tokenizer.apply_chat_template(chat, tokenize=True, add_generation_prompt=True, return_tensors="pt", padding=True, truncation=True)
                 chat = chat.cuda()
                 outputs = model.generate(chat, max_new_tokens=256)

@@ -4,7 +4,7 @@ import os
 import re
 import sys
 import sqlite3
-  
+import ipdb
 from transformers import AutoTokenizer
 from utils.enums import LLM
 from sql_metadata import Parser
@@ -185,14 +185,9 @@ def count_tokens(string: str, tokenizer_type: str=None, tokenizer=None):
 
 def sql_normalization(sql):
     sql = sql.strip()
+
     def white_space_fix(s):
-        parsed_s = Parser(s)
-        try:
-            s = " ".join([token.value for token in parsed_s.tokens])
-        except Exception as e:
-            print(s)
-            exit
-        return s
+        return re.sub(r'\s+', ' ', s)
 
     # convert everything except text between single quotation marks to lower case
     def lower(s):
@@ -257,11 +252,9 @@ def sql_normalization(sql):
         return toks
 
     def remove_table_alias(s):
-        try:
-            tables_aliases = Parser(s).tables_aliases
-        except Exception as e:
-            print(s)
-            exit
+        tables_aliases = Parser(s).tables_aliases
+        # parser = Parser(s)
+        # ipdb.set_trace()
         new_tables_aliases = {}
         for i in range(1, 11):
             if "t{}".format(i) in tables_aliases.keys():
@@ -315,7 +308,12 @@ def sql_normalization(sql):
 
     processing_func = lambda x: remove_table_alias(add_asc(lower(white_space_fix(double2single(remove_semicolon(x))))))
 
-    return processing_func(sql.strip())
+    try:
+        sql = processing_func(sql.strip())
+    except Exception as e:
+        sql = 'select'
+
+    return sql
 
 
 def sql2skeleton(sql: str, db_schema):
@@ -439,27 +437,22 @@ def jaccard_similarity(skeleton1, skeleton2):
 def get_template(prompts):
     if isinstance(prompts, str):
         prompts = [prompts]
-    question_pattern = re.compile(r'(/\* Answer the following: .*? \*/\nSELECT .*)')
-    schema_pattern = re.compile(r'(/\* Given the following database schema: \*/\n.*)', re.DOTALL)
-    shot_pattern = re.compile(r'(/\* Some SQL examples are provided based on similar problems: \*/.*)')
+    pattern = re.compile(r'(/\* Some SQL examples are provided based on similar problems: \*/.*).*?(/\* Given the following database schema: \*/.*).*?(/\* Answer the following: .*? \*/\nSELECT .*)', re.DOTALL)
     chat = []
     for prompt in prompts:
-        question = question_pattern.findall(prompt)[-1]
-        shot = prompt.split(question)[0]
-        schema = schema_pattern.search(shot).group()
-        examples = shot.split(schema)[0]
+        find_pattern = pattern.findall(prompt)
         chat.append([
             {
                 "role": "system",
-                "content": examples
+                "content": find_pattern[0][0]
             },
             {
                 "role": "system",
-                "content": schema,
+                "content": find_pattern[0][1],
             },
             {
                 "role": "user",
-                "content": question
+                "content": find_pattern[0][2]
             }
         ])
     return chat
@@ -480,11 +473,7 @@ def get_answer(answer):
     return ans
 
 if __name__ == '__main__':
-    questions = [
-        "/* Some SQL examples are provided based on similar problems: */\n/* Answer the following: What is the total number of students? */\nSELECT count(*) FROM Student\n\n/* Answer the following: What is the total number of companies? */\nSELECT count(*) FROM company\n\n/* Answer the following: What is the total number of campuses? */\nSELECT count(*) FROM campuses\n\n/* Answer the following: What is the total number of games played? */\nSELECT sum(gamesplayed) FROM Sportsinfo\n\n/* Answer the following: What is the total count of enzymes? */\nSELECT count(*) FROM enzyme\n\n/* Answer the following: What is the number of employees? */\nSELECT count(*) FROM Employee\n\n/* Answer the following: What is the number of flights? */\nSELECT count(*) FROM Flight\n\n/* Answer the following: What is the number of technicians? */\nSELECT count(*) FROM technician\n\n/* Answer the following: What is the number of ships? */\nSELECT count(*) FROM ship\n\n/* Given the following database schema: */\nCREATE TABLE \"stadium\" (\n\"Stadium_ID\" int,\n\"Location\" text,\n\"Name\" text,\n\"Capacity\" int,\n\"Highest\" int,\n\"Lowest\" int,\n\"Average\" int,\nPRIMARY KEY (\"Stadium_ID\")\n)\n\nCREATE TABLE \"singer\" (\n\"Singer_ID\" int,\n\"Name\" text,\n\"Country\" text,\n\"Song_Name\" text,\n\"Song_release_year\" text,\n\"Age\" int,\n\"Is_male\" bool,\nPRIMARY KEY (\"Singer_ID\")\n)\n\nCREATE TABLE \"concert\" (\n\"concert_ID\" int,\n\"concert_Name\" text,\n\"Theme\" text,\n\"Stadium_ID\" text,\n\"Year\" text,\nPRIMARY KEY (\"concert_ID\"),\nFOREIGN KEY (\"Stadium_ID\") REFERENCES \"stadium\"(\"Stadium_ID\")\n)\n\nCREATE TABLE \"singer_in_concert\" (\n\"concert_ID\" int,\n\"Singer_ID\" text,\nPRIMARY KEY (\"concert_ID\",\"Singer_ID\"),\nFOREIGN KEY (\"concert_ID\") REFERENCES \"concert\"(\"concert_ID\"),\nFOREIGN KEY (\"Singer_ID\") REFERENCES \"singer\"(\"Singer_ID\")\n)\n\n/* Answer the following: What is the total number of singers? */\nSELECT "
-    ]
-    get_template(questions)
-
-    # with open('../results/original_text.txt', "r") as f:
-    #     text = f.read()
-    #     get_answer2(text)
+    sql = """
+    SELECT 
+    """
+    print(sql_normalization(sql))
