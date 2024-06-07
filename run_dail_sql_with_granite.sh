@@ -1,5 +1,5 @@
 # echo "data_preprocess"
-# python data_preprocess.py
+python data_preprocess.py
 
 # echo "generate question with EUCDISQUESTIONMASK"
 # python generate_question.py \
@@ -12,11 +12,11 @@
 # --example_type QA \
 # --selector_type  EUCDISQUESTIONMASK
 
-echo "generate SQL by granite-8b-instruct for EUCDISMASKPRESKLSIMTHR as the pre-generated SQL query"
+echo "generate SQL by granite-20b-instruct for EUCDISMASKPRESKLSIMTHR as the pre-generated SQL query"
 python ask_llm.py \
---model granite-8b-instruct \
+--model granite-20b-instruct \
 --question ./dataset/process/SPIDER-TEST_SQL_9-SHOT_EUCDISQUESTIONMASK_QA-EXAMPLE_CTX-200_ANS-4096_test \
---batch_size 16
+--batch_size 1
 
 # echo "generate question with EUCDISMASKPRESKLSIMTHR"
 # python generate_question.py \

@@ -3,6 +3,9 @@
 pretrained_model/
 third_party/
 vector_cache/
-*/__pycache__
+**/__pycache__
 img/
 .ipynb_checkpoints/
+*.sh
+*.ipynb
+*.out
