@@ -8,3 +8,4 @@ img/
 **/.ipynb_checkpoints/
 *.sh
 **/*.ipynb
+dataset/
