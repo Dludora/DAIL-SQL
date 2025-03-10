@@ -2,6 +2,8 @@ import argparse
 import json
 import os
 import pickle
+import glob
+import shutil
 from pathlib import Path
 import sqlite3
 from tqdm import tqdm
@@ -66,12 +68,59 @@ def schema_linking_producer(test, train, table, db, dataset_dir, compute_cv_link
     linking_processor.save()
 
 
-def bird_pre_process(bird_dir, with_evidence=False):
-    new_db_path = os.path.join(bird_dir, "database")
-    if not os.path.exists(new_db_path):
-        os.system(f"cp -r {os.path.join(bird_dir, 'train/train_databases/*')} {new_db_path}")
-        os.system(f"cp -r {os.path.join(bird_dir, 'dev/dev_databases/*')} {new_db_path}")
 
+def schema_linking_producer_for_bird(test, train, table, db, dataset_dir, compute_cv_link=True):
+    # load data
+    test_data = json.load(open(os.path.join(dataset_dir, test)))
+    train_data = json.load(open(os.path.join(dataset_dir, train)))
+
+    # load schemas
+    schemas, _ = load_tables([os.path.join(dataset_dir, table)])
+
+    # Backup in-memory copies of all the DBs and create the live connections
+    for db_id, schema in tqdm(schemas.items(), desc="DB connections"):
+        sqlite_path = Path(dataset_dir) / db / db_id / f"{db_id}.sqlite"
+        source: sqlite3.Connection
+        with sqlite3.connect(str(sqlite_path)) as source:
+            dest = sqlite3.connect(':memory:')
+            dest.row_factory = sqlite3.Row
+            source.backup(dest)
+        schema.connection = dest
+
+    word_emb = GloVe(kind='42B', lemmatize=True)
+    linking_processor = SpiderEncoderV2Preproc(dataset_dir,
+            min_freq=4,
+            max_count=5000,
+            include_table_name_in_column=False,
+            word_emb=word_emb,
+            fix_issue_16_primary_keys=True,
+            compute_sc_link=True,
+            compute_cv_link=compute_cv_link)
+
+    # build schema-linking
+    for data, section in zip([test_data, train_data],['test', 'train']):
+        for item in tqdm(data, desc=f"{section} section linking"):
+            db_id = item["db_id"]
+            schema = schemas[db_id]
+            to_add, validation_info = linking_processor.validate_item(item, schema, section)
+            if to_add:
+                linking_processor.add_item(item, schema, section, validation_info)
+
+    # save
+    linking_processor.save()
+
+
+def bird_pre_process(bird_dir, with_evidence=False):
+    new_db_path = os.path.join(bird_dir, "databases")
+    os.makedirs(new_db_path, exist_ok=True)
+    
+    train_databases = os.path.join(bird_dir, 'train/train_databases')
+    dev_databases = os.path.join(bird_dir, 'dev/dev_databases')
+    
+    shutil.copytree(train_databases, new_db_path)
+    shutil.copytree(dev_databases, new_db_path)
+
+    
     def json_preprocess(data_jsons):
         new_datas = []
         for data_json in data_jsons:
@@ -111,6 +160,7 @@ def bird_pre_process(bird_dir, with_evidence=False):
         tables.extend(json.load(f))
     with open(os.path.join(bird_dir, 'tables.json'), 'w') as f:
         json.dump(tables, f, indent=4)
+        f.close()
 
 
 
@@ -138,16 +188,20 @@ if __name__ == '__main__':
         spider_dev = "test_data/dev.json"
         spider_train = 'train_spider_and_others.json'
         spider_table = 'tables.json'
-        spider_table = 'tables.json'
         spider_db = 'database'
         schema_linking_producer(spider_dev, spider_train, spider_table, spider_db, spider_dir)
     elif data_type == "bird":
         # schema-linking for bird with evidence
         bird_dir = os.path.join(args.data_root, 'bird')
-        bird_pre_process(bird_dir, with_evidence=True)
+        # bird_pre_process(bird_dir, with_evidence=True)
         bird_dev = 'dev.json'
         bird_train = 'train.json'
         bird_table = 'tables.json'
         bird_db = 'databases'
         ## do not compute the cv_link since it is time-consuming in the huge database in BIRD
-        schema_linking_producer(bird_dev, bird_train, bird_table, bird_db, bird_dir, compute_cv_link=False)
+        schema_linking_producer_for_bird(bird_dev, bird_train, bird_table, bird_db, bird_dir, compute_cv_link=False)
+    elif data_type == "minibird":
+        minibird_dir = os.path.join(args.data_root, 'minibird/MINIDEV')
+        minibird_table = "dev_tables.json"
+        minibird_db = "dev_databases"
+        

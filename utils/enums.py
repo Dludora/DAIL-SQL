@@ -58,6 +58,7 @@ class LLM:
     GRANITE_8B_BASE = "granite-8b-base"
     GRANITE_8B_INSTRUCT = "granite-8b-instruct"
     GRANITE_20B_INSTRUCT = "granite-20b-instruct"
+    CODELLAMA_7B_INSTRUCT = "codellama-7b-instruct"
     # TONG_YI_QIAN_WEN = "qwen-v1"
 
     # LLMs that use openai completion api
@@ -82,6 +83,7 @@ class LLM:
         GRANITE_8B_BASE,
         GRANITE_8B_INSTRUCT,
         GRANITE_20B_INSTRUCT,
+        CODELLAMA_7B_INSTRUCT,
     ]
 
     costs_per_thousand = {
@@ -107,6 +109,7 @@ class LLM:
         GRANITE_8B_BASE,
         GRANITE_8B_INSTRUCT,
         GRANITE_20B_INSTRUCT,
+        CODELLAMA_7B_INSTRUCT,
     ]
 
     OPEN_AI_LLM = {
@@ -125,10 +128,12 @@ class LLM:
         GRANITE_8B_BASE,
         GRANITE_8B_INSTRUCT,
         GRANITE_20B_INSTRUCT,
+        CODELLAMA_7B_INSTRUCT,
     }
 
     OPEN_SOURCE_2_PATH = {
         GRANITE_8B_BASE: "/data/koushurui/Code/LLMS/ibm-granite/granite-8b-code-base",
         GRANITE_8B_INSTRUCT: "/data/koushurui/Code/LLMS/ibm-granite/granite-8b-code-instruct",
-        GRANITE_20B_INSTRUCT: "/data/koushurui/Code/LLMS/ibm-granite/granite-20b-code-instruct"
+        GRANITE_20B_INSTRUCT: "/data/koushurui/Code/LLMS/ibm-granite/granite-20b-code-instruct",
+        CODELLAMA_7B_INSTRUCT: "/data/koushurui/Code/LLMS/codellama/CodeLlama-7b-Instruct-hf",
     }

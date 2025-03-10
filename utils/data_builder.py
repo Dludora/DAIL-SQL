@@ -8,7 +8,7 @@ from utils.linking_utils.application import get_question_pattern_with_schema_lin
 class BasicDataset(object):
     def __init__(self, path_data, pre_test_result=None):
         self.path_data = os.path.join(path_data, self.name)
-        self.path_db = os.path.join(self.path_data, "test_database")
+        self.path_db = os.path.join(self.path_data, "databases")
         self.test_json = os.path.join(self.path_data, self.test_json)
         self.test_gold = os.path.join(self.path_data, self.test_gold)
         self.train_json = os.path.join(self.path_data, self.train_json)
@@ -238,6 +238,11 @@ class BirdDataset(BasicDataset):
     mini_test_index_json = None
 
 
+class MiniDevDataset(BasicDataset):
+    name = "minidev"
+    
+
+
 def load_data(data_type, path_data, pre_test_result=None):
     if data_type.lower() == "spider":
         return SpiderDataset(path_data, pre_test_result)
@@ -245,5 +250,7 @@ def load_data(data_type, path_data, pre_test_result=None):
         return RealisticDataset(path_data, pre_test_result)
     elif data_type.lower() == "bird":
         return BirdDataset(path_data, pre_test_result)
+    elif data_type.lower() == "minidev":
+        return MiniDevDataset(path_data, pre_test_result)
     else:
         raise RuntimeError()

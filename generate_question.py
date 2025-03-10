@@ -11,7 +11,6 @@ from utils.enums import REPR_TYPE, EXAMPLE_TYPE, SELECTOR_TYPE, LLM
 from utils.utils import cost_estimate
 from tqdm import tqdm
 
-import ipdb
 
 PATH_DATA = "/data/koushurui/Data/text2sql"
 
@@ -20,7 +19,7 @@ sys.path.append("/home/koushurui/Documents/Data/")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_type", type=str, choices=["spider", "realistic", "bird"], default="spider")
+    parser.add_argument("--data_type", type=str, choices=["spider", "realistic", "bird", "minidev"], default="spider")
     parser.add_argument("--split", type=str, choices=["train", "test"], default="test",  required=True)
     parser.add_argument("--k_shot", type=int, default=0, help="Number of examples")
     parser.add_argument("--prompt_repr", type=str, choices=[REPR_TYPE.CODE_REPRESENTATION,
@@ -84,7 +83,6 @@ if __name__ == '__main__':
     cross_domain = args.split == "train"
 
     for question_json in tqdm(getattr(data, func_name)()):
-        
         question_format = prompt.format(target=question_json,
                                         max_seq_len=args.max_seq_len,
                                         max_ans_len=args.max_ans_len,
@@ -125,7 +123,7 @@ if __name__ == '__main__':
         "questions": questions
     }
     
-    path_generate = f"dataset/process/{args.data_type.upper()}-{args.split.upper()}_{prompt.name}_CTX-{args.max_ans_len}_ANS-{args.max_seq_len}_test"
+    path_generate = f"dataset/test/{args.data_type.upper()}/{args.split.upper()}/{prompt.name}_CTX-{args.max_ans_len}_ANS-{args.max_seq_len}"
         
     os.makedirs(path_generate, exist_ok=True)
     json.dump(task, open(os.path.join(path_generate, "questions.json"), "w"), indent=4)

@@ -5,7 +5,6 @@ third_party/
 vector_cache/
 **/__pycache__
 img/
-.ipynb_checkpoints/
+**/.ipynb_checkpoints/
 *.sh
-*.ipynb
-*.out
+**/*.ipynb

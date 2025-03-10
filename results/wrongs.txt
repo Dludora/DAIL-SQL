@@ -1,4 +1,0 @@
-Name 
-FROM region 
-WHERE Region_ID NOT IN (SELECT Region_ID FROM building)
-
